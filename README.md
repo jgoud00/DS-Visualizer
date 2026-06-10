@@ -58,13 +58,3 @@ Ensure you have [Node.js](https://nodejs.org/) installed on your machine.
    ```bash
    npm run build
    ```
-
-## 📂 Architecture Overview
-
-* `src/algorithms/`: Pure ES6 generator functions yielding steps (`data`, `active`, `comparing`, `pointers`, `pseudocodeLine`). Zero React imports.
-* `src/visualizers/`: Algorithm-specific React components that consume the yielded steps and map them to Framer Motion/SVG canvas layouts.
-* `src/hooks/useVisualizer.js`: A central state machine that aggregates the generator steps and exposes timeline controls (`play`, `pause`, `stepForward`, etc.).
-
-## 📄 License
-
-This project is open-source and available under the MIT License.
