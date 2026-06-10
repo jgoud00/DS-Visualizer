@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 
 export const useVisualizer = () => {
   const [steps, setSteps] = useState([]);
+  const stepsRef = useRef([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(5); // 1 to 10
@@ -21,7 +22,7 @@ export const useVisualizer = () => {
   }, [clearTimer]);
 
   const play = useCallback(() => {
-    if (steps.length === 0 || currentStep >= steps.length - 1) return;
+    if (stepsRef.current.length === 0 || currentStep >= stepsRef.current.length - 1) return;
     
     setIsPlaying(true);
     clearTimer();
@@ -33,7 +34,7 @@ export const useVisualizer = () => {
 
     timerRef.current = setInterval(() => {
       setCurrentStep(prev => {
-        if (prev >= steps.length - 1) {
+        if (prev >= stepsRef.current.length - 1) {
           pause();
           return prev;
         }
@@ -49,7 +50,7 @@ export const useVisualizer = () => {
 
   const stepForward = useCallback(() => {
     pause();
-    setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
+    setCurrentStep(prev => Math.min(prev + 1, stepsRef.current.length - 1));
   }, [steps.length, pause]);
 
   const stepBackward = useCallback(() => {
@@ -69,6 +70,7 @@ export const useVisualizer = () => {
       result = generator.next();
     }
     
+    stepsRef.current = collectedSteps;
     setSteps(collectedSteps);
     setCurrentStep(0);
   }, [pause]);
