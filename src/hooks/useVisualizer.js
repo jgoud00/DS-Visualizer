@@ -43,6 +43,13 @@ export const useVisualizer = () => {
     }, delay);
   }, [steps.length, currentStep, speed, pause, clearTimer]);
 
+  const clear = useCallback(() => {
+    pause();
+    setSteps([]);
+    stepsRef.current = [];
+    setCurrentStep(0);
+  }, [pause]);
+
   const reset = useCallback(() => {
     pause();
     setCurrentStep(0);
@@ -91,6 +98,7 @@ export const useVisualizer = () => {
     play,
     pause,
     reset,
+    clear,
     stepForward,
     stepBackward,
     loadSteps,

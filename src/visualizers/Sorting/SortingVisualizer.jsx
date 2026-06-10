@@ -44,6 +44,10 @@ const SortingVisualizer = () => {
     setBaseArray(generateRandomArray(arraySize));
   }, [arraySize]);
 
+  useEffect(() => {
+    visualizer.clear();
+  }, [baseArray, algorithm]);
+
   const handleSort = () => {
     visualizer.loadSteps(ALGORITHMS[algorithm].fn, [...baseArray]);
   };
@@ -100,7 +104,7 @@ const SortingVisualizer = () => {
         <div className="input-controls panel">
           <select
             value={algorithm}
-            onChange={(e) => { setAlgorithm(e.target.value); visualizer.reset(); }}
+            onChange={(e) => { setAlgorithm(e.target.value); visualizer.clear(); }}
             disabled={visualizer.isPlaying}
             className="viz-select"
           >
@@ -122,7 +126,7 @@ const SortingVisualizer = () => {
           </div>
 
           <button
-            onClick={() => { setBaseArray(generateRandomArray(arraySize)); visualizer.reset(); }}
+            onClick={() => { setBaseArray(generateRandomArray(arraySize)); visualizer.clear(); }}
             disabled={visualizer.isPlaying}
             className="viz-btn primary-btn"
           >

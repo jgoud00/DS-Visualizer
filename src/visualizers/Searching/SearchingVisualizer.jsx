@@ -59,7 +59,10 @@ const SearchingVisualizer = () => {
 
   const handleSearch = () => {
     const val = parseInt(target);
-    if (isNaN(val)) return;
+    if (isNaN(val)) {
+      alert('Please enter a target number to search for.');
+      return;
+    }
     const fn = algorithm === 'linear' ? linearSearch : binarySearch;
     visualizer.loadSteps(fn, { arr: [...baseArray], target: val });
     visualizer.play();
