@@ -1,0 +1,79 @@
+.graph-workspace {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.input-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.divider {
+  width: 2px;
+  height: 30px;
+  background: var(--panel-border);
+  margin: 0 0.5rem;
+}
+
+.graph-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 400px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--panel-border);
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.graph-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ds-state-panel {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.ds-state {
+  background: var(--bg-primary);
+  border: 1px solid var(--panel-border);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.graph-error-msg,
+.graph-step-msg {
+  background: var(--bg-secondary);
+  border: 1px solid var(--panel-border);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.graph-error-msg {
+  border-left: 4px solid var(--viz-danger);
+  color: var(--viz-danger);
+}

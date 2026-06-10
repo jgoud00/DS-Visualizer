@@ -1,0 +1,148 @@
+.ll-workspace {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.input-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ll-canvas {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.ll-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 2rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.ll-node-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 0.5rem;
+}
+
+.ll-node {
+  display: flex;
+  border: 2px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-primary);
+  height: 50px;
+  min-width: 80px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ll-node-value {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0 1rem;
+  color: var(--text-primary);
+}
+
+.ll-node-next {
+  width: 30px;
+  border-left: 2px solid var(--panel-border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-secondary);
+  transition: background-color 0.3s ease;
+}
+
+.ll-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: background-color 0.3s ease;
+}
+
+.ll-null {
+  font-family: monospace;
+  font-weight: bold;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-left: 0.5rem;
+}
+
+.ll-arrow {
+  margin: 0 0.25rem;
+  overflow: visible;
+}
+
+.ll-pointer-labels {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ll-pointer-tag {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--panel-border);
+  white-space: nowrap;
+}
+
+.pointer-arrow {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.empty-ll-text {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.ll-node.default { border-color: var(--viz-default); }
+.ll-node.active { border-color: var(--viz-active); box-shadow: 0 0 0 2px var(--viz-active); }
+.ll-node.comparing { border-color: var(--viz-comparing); box-shadow: 0 0 0 2px var(--viz-comparing); }
+
+.ll-node.active .ll-node-next { background: var(--viz-active); border-color: var(--viz-active); }
+.ll-node.active .ll-dot { background: var(--bg-primary); }
+
+.ll-error-msg,
+.ll-step-msg {
+  background: var(--bg-secondary);
+  border: 1px solid var(--panel-border);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.ll-error-msg {
+  border-left: 4px solid var(--viz-danger);
+  color: var(--viz-danger);
+}

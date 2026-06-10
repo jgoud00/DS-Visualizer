@@ -1,0 +1,72 @@
+/* d:\College\KLH\Term 3\CFAI\DS-Visualizer\src\visualizers\Array\ArrayVisualizer.css */
+
+.array-workspace {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.input-controls {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.viz-input {
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--panel-border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  width: 100px;
+}
+
+.viz-btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.array-canvas {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.array-box {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 1.2rem;
+  position: relative;
+  border: 2px solid transparent;
+  color: #fff;
+}
+
+.array-index {
+  position: absolute;
+  bottom: -25px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.array-box.default { background-color: var(--viz-default); }
+.array-box.active { background-color: var(--viz-active); }
+.array-box.comparing { background-color: var(--viz-comparing); color: #1c1917; }
+.array-box.success { background-color: var(--viz-success); }
+.array-box.danger { background-color: var(--viz-danger); }
