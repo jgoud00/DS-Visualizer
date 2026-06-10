@@ -30,13 +30,13 @@ export function* linearSearch({ arr, target }) {
       comparing: [i],
       active: [],
       sorted: [],
-      message: `Comparing arr[${i}] = ${arr[i]} with target ${target}`,
+      message: `Comparing arr[${i}] = ${arr[i]?.val ?? arr[i]} with target ${target}`,
       pseudocodeLine: 2,
       phase: 'comparing',
       pointers: {},
     };
 
-    if (arr[i] === target) {
+    if ((arr[i]?.val ?? arr[i]) === target) {
       yield {
         data: [...arr],
         comparing: [],
@@ -114,14 +114,14 @@ export function* binarySearch({ arr, target }) {
       comparing: [mid],
       active: [],
       sorted: [],
-      message: `Comparing arr[${mid}] = ${arr[mid]} with target ${target}`,
+      message: `Comparing arr[${mid}] = ${arr[mid]?.val ?? arr[mid]} with target ${target}`,
       pseudocodeLine: 4,
       phase: 'comparing',
       pointers: { LOW: low, MID: mid, HIGH: high },
       eliminated: [...eliminated],
     };
 
-    if (arr[mid] === target) {
+    if ((arr[mid]?.val ?? arr[mid]) === target) {
       yield {
         data: [...arr],
         comparing: [],
@@ -134,7 +134,7 @@ export function* binarySearch({ arr, target }) {
         eliminated: [...eliminated],
       };
       return;
-    } else if (arr[mid] < target) {
+    } else if ((arr[mid]?.val ?? arr[mid]) < target) {
       for (let e = low; e <= mid; e++) eliminated.add(e);
       low = mid + 1;
 
@@ -143,7 +143,7 @@ export function* binarySearch({ arr, target }) {
         comparing: [],
         active: [],
         sorted: [],
-        message: `arr[${mid}] = ${arr[mid]} < ${target} — eliminate left half, set LOW = ${low}`,
+        message: `arr[${mid}] = ${arr[mid]?.val ?? arr[mid]} < ${target} — eliminate left half, set LOW = ${low}`,
         pseudocodeLine: 6,
         phase: 'eliminate-left',
         pointers: { LOW: low, HIGH: high },
@@ -158,7 +158,7 @@ export function* binarySearch({ arr, target }) {
         comparing: [],
         active: [],
         sorted: [],
-        message: `arr[${mid}] = ${arr[mid]} > ${target} — eliminate right half, set HIGH = ${high}`,
+        message: `arr[${mid}] = ${arr[mid]?.val ?? arr[mid]} > ${target} — eliminate right half, set HIGH = ${high}`,
         pseudocodeLine: 8,
         phase: 'eliminate-right',
         pointers: { LOW: low, HIGH: high },

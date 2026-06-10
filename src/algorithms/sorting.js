@@ -102,10 +102,10 @@ export function* insertionSort(arr) {
     const key = a[i];
     let j = i - 1;
 
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `Picking key = arr[${i}] = ${key}`, pseudocodeLine: 2, phase: 'pick-key' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `Picking key = arr[${i}] = ${key?.val ?? key}`, pseudocodeLine: 2, phase: 'pick-key' };
 
-    while (j >= 0 && a[j] > key) {
-      yield { data: [...a], comparing: [j], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `arr[${j}]=${a[j]?.val ?? a[j]} > key=${key} — shifting arr[${j}] right`, pseudocodeLine: 4, phase: 'compare-shift' };
+    while (j >= 0 && (a[j]?.val ?? a[j]) > (key?.val ?? key)) {
+      yield { data: [...a], comparing: [j], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `arr[${j}]=${a[j]?.val ?? a[j]} > key=${key?.val ?? key} — shifting arr[${j}] right`, pseudocodeLine: 4, phase: 'compare-shift' };
 
       a[j + 1] = a[j];
       yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...Array(i).keys()], active: [], message: `Shifted arr[${j}]=${a[j]?.val ?? a[j]} to position ${j + 1}`, pseudocodeLine: 5, phase: 'shift' };
@@ -114,7 +114,7 @@ export function* insertionSort(arr) {
     }
 
     a[j + 1] = key;
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...Array(i + 1).keys()], active: [j + 1], message: `Placed key=${key} at position ${j + 1}`, pseudocodeLine: 7, phase: 'place-key' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...Array(i + 1).keys()], active: [j + 1], message: `Placed key=${key?.val ?? key} at position ${j + 1}`, pseudocodeLine: 7, phase: 'place-key' };
   }
 
   yield { data: [...a], comparing: [], swapping: [], sorted: [...Array(n).keys()], active: [], message: 'Insertion sort complete!', pseudocodeLine: 8, phase: 'done' };
@@ -193,7 +193,7 @@ export function* mergeSort(arr) {
       for (let idx = left; idx <= right; idx++) sortedIndices.add(idx);
     }
 
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: Array.from({ length: right - left + 1 }, (_, k) => left + k), message: `Merged [${left}..${right}] → [${a.slice(left, right + 1)}]`, pseudocodeLine: 5, phase: 'merge-end' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: Array.from({ length: right - left + 1 }, (_, k) => left + k), message: `Merged [${left}..${right}] → [${a.slice(left, right + 1).map(x => x?.val ?? x)}]`, pseudocodeLine: 5, phase: 'merge-end' };
   }
 
   yield* mergeSortHelper(0, n - 1);
