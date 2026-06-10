@@ -29,7 +29,7 @@ const Controls = ({
               <Pause size={18} />
             </button>
           ) : (
-            <button className="control-btn primary-btn" onClick={onPlay} disabled={currentStep >= totalSteps - 1} aria-label="Play">
+            <button className="control-btn primary-btn" onClick={onPlay} disabled={totalSteps > 0 && currentStep >= totalSteps - 1} aria-label="Play">
               <Play size={18} />
             </button>
           )}
