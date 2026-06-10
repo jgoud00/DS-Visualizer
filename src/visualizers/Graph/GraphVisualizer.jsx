@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVisualizer } from '../../hooks/useVisualizer';
 import VisualizerLayout from '../../components/VisualizerLayout/VisualizerLayout';
-import { graphBFS, graphDFS, graphDetectCycle, graphConnectedComponents, EXAMPLE_GRAPHS } from '../../algorithms/graph';
+import { graphBFS, graphDFS, graphDetectCycle, graphConnectedComponents, graphDijkstra, graphTopologicalSort, EXAMPLE_GRAPHS } from '../../algorithms/graph';
 import * as d3Force from 'd3-force';
 import './GraphVisualizer.css';
 
@@ -48,6 +48,32 @@ const PSEUDOCODES = {
     '    BFS from node',
     '    assign all to compNum',
   ],
+  dijkstra: [
+    'function Dijkstra(graph, start):',
+    '  dist = { all: ∞, start: 0 }',
+    '  pq = [(start, 0)]',
+    '  while pq is not empty:',
+    '    curr = pq.extractMin()',
+    '    if visited[curr]: continue',
+    '    visited.add(curr)',
+    '    for neighbor, weight in edges(curr):',
+    '      if dist[curr] + weight < dist[neighbor]:',
+    '        dist[neighbor] = dist[curr] + weight',
+    '        pq.push((neighbor, dist[neighbor]))',
+  ],
+  topological: [
+    'function TopologicalSort(graph):',
+    '  inDegree = computeInDegrees()',
+    '  queue = nodes with inDegree == 0',
+    '  sorted = []',
+    '  while queue is not empty:',
+    '    curr = queue.dequeue()',
+    '    sorted.push(curr)',
+    '    for neighbor in edges(curr):',
+    '      inDegree[neighbor]--',
+    '      if inDegree[neighbor] == 0:',
+    '        queue.enqueue(neighbor)',
+  ],
 };
 
 const COMPLEXITY = {
@@ -55,6 +81,8 @@ const COMPLEXITY = {
   dfs: { time: 'O(V + E)', space: 'O(V)' },
   cycle: { time: 'O(V + E)', space: 'O(V)' },
   components: { time: 'O(V + E)', space: 'O(V)' },
+  dijkstra: { time: 'O((V + E) log V)', space: 'O(V)' },
+  topological: { time: 'O(V + E)', space: 'O(V)' },
 };
 
 const GraphVisualizer = () => {
@@ -64,7 +92,7 @@ const GraphVisualizer = () => {
   const [graphType, setGraphType] = useState('undirected');
   const [startNode, setStartNode] = useState(EXAMPLE_GRAPHS['undirected'].nodes[0].id);
   
-  const lastOp = useRef('bfs');
+  const [lastOp, setLastOp] = useState('bfs');
 
   useEffect(() => {
     setStartNode(EXAMPLE_GRAPHS[graphType].nodes[0].id);
@@ -72,23 +100,33 @@ const GraphVisualizer = () => {
   }, [graphType]);
 
   const handleBFS = () => {
-    lastOp.current = 'bfs';
+    setLastOp('bfs');
     visualizer.loadSteps(graphBFS, { graph: EXAMPLE_GRAPHS[graphType], startId: startNode });
   };
 
   const handleDFS = () => {
-    lastOp.current = 'dfs';
+    setLastOp('dfs');
     visualizer.loadSteps(graphDFS, { graph: EXAMPLE_GRAPHS[graphType], startId: startNode });
   };
 
   const handleDetectCycle = () => {
-    lastOp.current = 'cycle';
+    setLastOp('cycle');
     visualizer.loadSteps(graphDetectCycle, { graph: EXAMPLE_GRAPHS[graphType] });
   };
 
   const handleComponents = () => {
-    lastOp.current = 'components';
+    setLastOp('components');
     visualizer.loadSteps(graphConnectedComponents, { graph: EXAMPLE_GRAPHS[graphType] });
+  };
+
+    const handleDijkstra = () => {
+    setLastOp('dijkstra');
+    visualizer.loadSteps(graphDijkstra, { graph: EXAMPLE_GRAPHS[graphType], startId: startNode });
+  };
+
+  const handleTopological = () => {
+    setLastOp('topological');
+    visualizer.loadSteps(graphTopologicalSort, { graph: EXAMPLE_GRAPHS[graphType] });
   };
 
   const graphData = currentStepData?.data ?? EXAMPLE_GRAPHS[graphType];
@@ -97,7 +135,9 @@ const GraphVisualizer = () => {
   const visited = currentStepData?.visited ?? [];
   const queue = currentStepData?.queue ?? [];
   const stack = currentStepData?.stack ?? [];
-  const componentsMap = currentStepData?.components ?? {};
+    const componentsMap = currentStepData?.components ?? {};
+  const distancesMap = currentStepData?.distances ?? {};
+  const sortedList = currentStepData?.sortedList ?? [];
 
   // Compute fixed D3 Force layout synchronously based on current graphType
   const { layoutNodes, layoutEdges } = useMemo(() => {
@@ -158,9 +198,9 @@ const GraphVisualizer = () => {
         currentStep: visualizer.currentStep,
       }}
       infoPanelProps={{
-        pseudocode: PSEUDOCODES[lastOp.current],
+        pseudocode: PSEUDOCODES[lastOp],
         activeLine: currentStepData?.pseudocodeLine ?? null,
-        complexity: COMPLEXITY[lastOp.current],
+        complexity: COMPLEXITY[lastOp],
         logs,
       }}
     >
@@ -191,6 +231,12 @@ const GraphVisualizer = () => {
           <button onClick={handleComponents} disabled={visualizer.isPlaying} className="viz-btn primary-btn">
             Connected Components
           </button>
+        <button onClick={handleDijkstra} disabled={visualizer.isPlaying} className="viz-btn primary-btn">
+            Dijkstra
+          </button>
+          <button onClick={handleTopological} disabled={visualizer.isPlaying} className="viz-btn primary-btn">
+            Topological Sort
+          </button>
         </div>
 
         {currentStepData?.phase === 'error' && (
@@ -206,8 +252,8 @@ const GraphVisualizer = () => {
             </defs>
             <AnimatePresence>
               {layoutEdges.map((edge, i) => (
+                <g key={`e-${i}`}>
                 <motion.line
-                  key={`e-${i}`}
                   x1={edge.source.x}
                   y1={edge.source.y}
                   x2={edge.target.x}
@@ -220,6 +266,18 @@ const GraphVisualizer = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5, ease: 'easeInOut' }}
                 />
+                {edge.weight && (
+                  <text
+                    x={(edge.source.x + edge.target.x) / 2}
+                    y={(edge.source.y + edge.target.y) / 2 - 10}
+                    fill="var(--text-secondary)"
+                    fontSize="12px"
+                    textAnchor="middle"
+                  >
+                    {edge.weight}
+                  </text>
+                )}
+              </g>
               ))}
 
               {layoutNodes.map((node) => {
@@ -271,6 +329,16 @@ const GraphVisualizer = () => {
           </svg>
           
           <div className="ds-state-panel">
+            {Object.keys(distancesMap).length > 0 && (
+              <div className="ds-state">
+                <strong>Distances:</strong> {Object.entries(distancesMap).map(([k, v]) => `${k}:${v === Infinity ? '∞' : v}`).join(', ')}
+              </div>
+            )}
+            {sortedList.length > 0 && (
+              <div className="ds-state">
+                <strong>Topological Sort:</strong> [{sortedList.join(' → ')}]
+              </div>
+            )}
             {queue.length > 0 && (
               <div className="ds-state">
                 <strong>Queue:</strong> [{queue.join(', ')}]

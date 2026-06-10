@@ -52,7 +52,9 @@ export function* graphBFS({ graph, startId }) {
 
     const neighbors = adj[curr] || [];
 
-    for (const neighbor of neighbors) {
+    for (const edge of neighbors) {
+      const neighbor = edge.id;
+      const weight = edge.weight;
       yield makeStep(graph, {
         active: [curr],
         comparing: [neighbor],
@@ -159,7 +161,9 @@ export function* graphDFS({ graph, startId }) {
 
     const neighbors = adj[curr] || [];
 
-    for (const neighbor of neighbors) {
+    for (const edge of neighbors) {
+      const neighbor = edge.id;
+      const weight = edge.weight;
       yield makeStep(graph, {
         active: [curr],
         comparing: [neighbor],
@@ -262,7 +266,9 @@ export function* graphDetectCycle({ graph }) {
 
       const neighbors = adj[node] || [];
 
-      for (const neighbor of neighbors) {
+      for (const edge of neighbors) {
+      const neighbor = edge.id;
+      const weight = edge.weight;
         if (!visited.has(neighbor)) {
           dfsStack.push({ node: neighbor, parent: node });
 
@@ -367,7 +373,9 @@ export function* graphConnectedComponents({ graph }) {
 
       const neighbors = adj[curr] || [];
 
-      for (const neighbor of neighbors) {
+      for (const edge of neighbors) {
+      const neighbor = edge.id;
+      const weight = edge.weight;
         if (!visited.has(neighbor)) {
           visited.add(neighbor);
           components[neighbor] = componentNum;
@@ -397,6 +405,184 @@ export function* graphConnectedComponents({ graph }) {
   });
 }
 
+
+export function* graphDijkstra({ graph, startId }) {
+  const adj = graph.adjacencyList;
+  if (!adj[startId]) {
+    yield makeStep(graph, { message: `Error: Start node "${startId}" not found`, phase: 'error' });
+    return;
+  }
+
+  const distances = {};
+  for (const n of graph.nodes) distances[n.id] = Infinity;
+  distances[startId] = 0;
+
+  const visited = new Set();
+  const pq = [{ id: startId, dist: 0 }];
+
+  yield makeStep(graph, {
+    active: [startId],
+    distances: { ...distances },
+    message: `Initialize distances. Set distance to start "${startId}" = 0`,
+    pseudocodeLine: 1,
+    phase: 'init',
+  });
+
+  while (pq.length > 0) {
+    pq.sort((a, b) => a.dist - b.dist);
+    const currObj = pq.shift();
+    const curr = currObj.id;
+
+    if (visited.has(curr)) continue;
+    
+    yield makeStep(graph, {
+      active: [curr],
+      visited: [...visited],
+      distances: { ...distances },
+      message: `Extract min node "${curr}" with distance ${distances[curr]}`,
+      pseudocodeLine: 4,
+      phase: 'extract-min',
+    });
+
+    visited.add(curr);
+
+    const neighbors = adj[curr] || [];
+    for (const edge of neighbors) {
+      const neighbor = edge.id;
+      const weight = edge.weight;
+
+      if (visited.has(neighbor)) continue;
+
+      yield makeStep(graph, {
+        active: [curr],
+        comparing: [neighbor],
+        visited: [...visited],
+        distances: { ...distances },
+        message: `Check neighbor "${neighbor}". Edge weight = ${weight}`,
+        pseudocodeLine: 6,
+        phase: 'check-neighbor',
+      });
+
+      const newDist = distances[curr] + weight;
+      if (newDist < distances[neighbor]) {
+        distances[neighbor] = newDist;
+        pq.push({ id: neighbor, dist: newDist });
+
+        yield makeStep(graph, {
+          active: [curr],
+          comparing: [neighbor],
+          visited: [...visited],
+          distances: { ...distances },
+          message: `Found shorter path to "${neighbor}" (distance = ${newDist})`,
+          pseudocodeLine: 8,
+          phase: 'relax',
+        });
+      }
+    }
+  }
+
+  yield makeStep(graph, {
+    visited: [...visited],
+    distances: { ...distances },
+    message: `Dijkstra's complete!`,
+    pseudocodeLine: 10,
+    phase: 'complete',
+  });
+}
+
+export function* graphTopologicalSort({ graph }) {
+  const adj = graph.adjacencyList;
+  const inDegree = {};
+  for (const n of graph.nodes) inDegree[n.id] = 0;
+
+  for (const node of graph.nodes) {
+    for (const edge of (adj[node.id] || [])) {
+      inDegree[edge.id]++;
+    }
+  }
+
+  const queue = [];
+  for (const n of graph.nodes) {
+    if (inDegree[n.id] === 0) queue.push(n.id);
+  }
+
+  const sorted = [];
+  const visited = new Set();
+
+  yield makeStep(graph, {
+    queue: [...queue],
+    sortedList: [...sorted],
+    message: `Calculate in-degrees. Enqueue nodes with in-degree 0: [${queue.join(', ')}]`,
+    pseudocodeLine: 1,
+    phase: 'init',
+  });
+
+  while (queue.length > 0) {
+    const curr = queue.shift();
+    sorted.push(curr);
+    visited.add(curr);
+
+    yield makeStep(graph, {
+      active: [curr],
+      queue: [...queue],
+      sortedList: [...sorted],
+      visited: [...visited],
+      message: `Dequeue "${curr}" and add to sorted order`,
+      pseudocodeLine: 4,
+      phase: 'dequeue',
+    });
+
+    const neighbors = adj[curr] || [];
+    for (const edge of neighbors) {
+      const neighbor = edge.id;
+      inDegree[neighbor]--;
+
+      yield makeStep(graph, {
+        active: [curr],
+        comparing: [neighbor],
+        queue: [...queue],
+        sortedList: [...sorted],
+        visited: [...visited],
+        message: `Decrement in-degree of "${neighbor}" to ${inDegree[neighbor]}`,
+        pseudocodeLine: 7,
+        phase: 'decrement',
+      });
+
+      if (inDegree[neighbor] === 0) {
+        queue.push(neighbor);
+        yield makeStep(graph, {
+          active: [curr],
+          comparing: [neighbor],
+          queue: [...queue],
+          sortedList: [...sorted],
+          visited: [...visited],
+          message: `In-degree of "${neighbor}" is 0. Enqueue!`,
+          pseudocodeLine: 9,
+          phase: 'enqueue',
+        });
+      }
+    }
+  }
+
+  if (sorted.length !== graph.nodes.length) {
+    yield makeStep(graph, {
+      sortedList: [...sorted],
+      visited: [...visited],
+      message: `Graph has a cycle! Topological sort not possible.`,
+      phase: 'error',
+    });
+  } else {
+    yield makeStep(graph, {
+      sortedList: [...sorted],
+      visited: [...visited],
+      message: `Topological Sort complete: [${sorted.join(' → ')}]`,
+      pseudocodeLine: 11,
+      phase: 'complete',
+    });
+  }
+}
+
+
 export const EXAMPLE_GRAPHS = {
   undirected: {
     nodes: [
@@ -404,14 +590,18 @@ export const EXAMPLE_GRAPHS = {
       { id: 'D', label: 'D' }, { id: 'E', label: 'E' }, { id: 'F', label: 'F' },
     ],
     edges: [
-      { id: 'e1', source: 'A', target: 'B' }, { id: 'e2', source: 'A', target: 'C' },
-      { id: 'e3', source: 'B', target: 'D' }, { id: 'e4', source: 'C', target: 'D' },
-      { id: 'e5', source: 'C', target: 'E' }, { id: 'e6', source: 'D', target: 'F' },
-      { id: 'e7', source: 'E', target: 'F' },
+      { id: 'e1', source: 'A', target: 'B', weight: 4 }, { id: 'e2', source: 'A', target: 'C', weight: 2 },
+      { id: 'e3', source: 'B', target: 'D', weight: 5 }, { id: 'e4', source: 'C', target: 'D', weight: 1 },
+      { id: 'e5', source: 'C', target: 'E', weight: 8 }, { id: 'e6', source: 'D', target: 'F', weight: 6 },
+      { id: 'e7', source: 'E', target: 'F', weight: 3 },
     ],
     adjacencyList: {
-      A: ['B', 'C'], B: ['A', 'D'], C: ['A', 'D', 'E'],
-      D: ['B', 'C', 'F'], E: ['C', 'F'], F: ['D', 'E'],
+      A: [{id: 'B', weight: 4}, {id: 'C', weight: 2}], 
+      B: [{id: 'A', weight: 4}, {id: 'D', weight: 5}], 
+      C: [{id: 'A', weight: 2}, {id: 'D', weight: 1}, {id: 'E', weight: 8}],
+      D: [{id: 'B', weight: 5}, {id: 'C', weight: 1}, {id: 'F', weight: 6}], 
+      E: [{id: 'C', weight: 8}, {id: 'F', weight: 3}], 
+      F: [{id: 'D', weight: 6}, {id: 'E', weight: 3}],
     },
   },
   directed: {
@@ -420,12 +610,16 @@ export const EXAMPLE_GRAPHS = {
       { id: '4', label: '4' }, { id: '5', label: '5' },
     ],
     edges: [
-      { id: 'e1', source: '1', target: '2' }, { id: 'e2', source: '2', target: '3' },
-      { id: 'e3', source: '3', target: '4' }, { id: 'e4', source: '4', target: '2' },
-      { id: 'e5', source: '1', target: '5' }, { id: 'e6', source: '5', target: '3' },
+      { id: 'e1', source: '1', target: '2', weight: 3 }, { id: 'e2', source: '2', target: '3', weight: 1 },
+      { id: 'e3', source: '3', target: '4', weight: 4 }, { id: 'e4', source: '4', target: '2', weight: 2 },
+      { id: 'e5', source: '1', target: '5', weight: 7 }, { id: 'e6', source: '5', target: '3', weight: 2 },
     ],
     adjacencyList: {
-      1: ['2', '5'], 2: ['3'], 3: ['4'], 4: ['2'], 5: ['3'],
+      1: [{id: '2', weight: 3}, {id: '5', weight: 7}], 
+      2: [{id: '3', weight: 1}], 
+      3: [{id: '4', weight: 4}], 
+      4: [{id: '2', weight: 2}], 
+      5: [{id: '3', weight: 2}],
     },
   },
   disconnected: {
@@ -435,13 +629,17 @@ export const EXAMPLE_GRAPHS = {
       { id: 'g', label: 'g' },
     ],
     edges: [
-      { id: 'e1', source: 'a', target: 'b' }, { id: 'e2', source: 'b', target: 'c' },
-      { id: 'e3', source: 'a', target: 'c' },
-      { id: 'e4', source: 'd', target: 'e' }, { id: 'e5', source: 'e', target: 'f' },
+      { id: 'e1', source: 'a', target: 'b', weight: 1 }, { id: 'e2', source: 'b', target: 'c', weight: 2 },
+      { id: 'e3', source: 'a', target: 'c', weight: 3 },
+      { id: 'e4', source: 'd', target: 'e', weight: 4 }, { id: 'e5', source: 'e', target: 'f', weight: 5 },
     ],
     adjacencyList: {
-      a: ['b', 'c'], b: ['a', 'c'], c: ['a', 'b'],
-      d: ['e'], e: ['d', 'f'], f: ['e'],
+      a: [{id: 'b', weight: 1}, {id: 'c', weight: 3}], 
+      b: [{id: 'a', weight: 1}, {id: 'c', weight: 2}], 
+      c: [{id: 'a', weight: 3}, {id: 'b', weight: 2}],
+      d: [{id: 'e', weight: 4}], 
+      e: [{id: 'd', weight: 4}, {id: 'f', weight: 5}], 
+      f: [{id: 'e', weight: 5}],
       g: [],
     },
   },
