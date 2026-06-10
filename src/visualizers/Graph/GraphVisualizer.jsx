@@ -215,9 +215,10 @@ const GraphVisualizer = () => {
                   stroke="var(--panel-border)"
                   strokeWidth="2"
                   markerEnd={graphType === 'directed' ? "url(#arrowhead)" : ""}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
                 />
               ))}
 
@@ -247,7 +248,10 @@ const GraphVisualizer = () => {
                       stroke={isStart ? 'white' : 'var(--panel-border)'}
                       strokeWidth={isStart ? '3' : '2'}
                       strokeDasharray={isStart ? '4' : '0'}
-                      animate={{ fill: color }}
+                      animate={{ 
+                        fill: color,
+                        scale: (active.includes(node.id) || isComparing) ? 1.15 : 1
+                      }}
                       transition={{ duration: 0.3 }}
                     />
                     <text

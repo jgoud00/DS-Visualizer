@@ -249,9 +249,10 @@ const BSTVisualizer = () => {
                   y2={edge.target.y}
                   stroke="var(--panel-border)"
                   strokeWidth="2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
                 />
               ))}
 

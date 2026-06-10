@@ -42,7 +42,7 @@ const ArrayVisualizer = () => {
   const visualizer = useVisualizer();
   const { currentStepData, steps } = visualizer;
 
-  const [baseArray, setBaseArray] = useState([5, 12, 8, 20, 3, 15]);
+  const [baseArray, setBaseArray] = useState(() => [5, 12, 8, 20, 3, 15].map(val => ({ id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9), val })));
   const [inputValue, setInputValue] = useState('');
   const [inputIndex, setInputIndex] = useState('');
   const lastOp = useRef('insert');
@@ -60,7 +60,7 @@ const ArrayVisualizer = () => {
     const idx = parseInt(inputIndex);
     if (isNaN(val) || isNaN(idx) || idx < 0 || idx > baseArray.length) return;
     lastOp.current = 'insert';
-    visualizer.loadSteps(arrayInsert, { arr: baseArray, index: idx, value: val });
+    visualizer.loadSteps(arrayInsert, { arr: baseArray, index: idx, item: { id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9), val } });
   };
 
   const handleDelete = () => {
@@ -143,14 +143,17 @@ const ArrayVisualizer = () => {
 
         <div className="array-canvas">
           <AnimatePresence>
-            {displayArray.map((val, idx) => {
+            {displayArray.map((item, idx) => {
+              const val = item.val !== undefined ? item.val : item;
+              const itemId = item.id !== undefined ? item.id : `${idx}-${val}`;
+              
               const pointerLabels = Object.entries(pointers)
                 .filter(([, v]) => v === idx)
                 .map(([k]) => k);
 
               return (
                 <motion.div
-                  key={`${idx}-${val}`}
+                  key={itemId}
                   layout
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}

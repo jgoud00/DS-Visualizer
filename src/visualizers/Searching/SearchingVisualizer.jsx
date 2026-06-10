@@ -35,7 +35,8 @@ const COMPLEXITY = {
 
 const generateArray = (sorted = false) => {
   const arr = Array.from({ length: 15 }, () => Math.floor(Math.random() * 90) + 10);
-  return sorted ? arr.sort((a, b) => a - b) : arr;
+  if (sorted) arr.sort((a, b) => a - b);
+  return arr.map(val => ({ id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9), val }));
 };
 
 const SearchingVisualizer = () => {
@@ -142,14 +143,16 @@ const SearchingVisualizer = () => {
         <div className="search-canvas">
           <div className="search-array-wrapper">
             <div className="search-boxes-container">
-              {displayArray.map((val, idx) => {
+              {displayArray.map((item, idx) => {
+                const val = item.val !== undefined ? item.val : item;
+                const itemId = item.id !== undefined ? item.id : idx;
                 const state = getBoxState(idx);
                 const isEliminated = eliminated.includes(idx);
                 const labels = pointerLabels[idx];
 
                 return (
                   <motion.div
-                    key={idx}
+                    key={itemId}
                     className={`search-box ${state}`}
                     style={{ opacity: isEliminated ? 0.3 : 1 }}
                     layout

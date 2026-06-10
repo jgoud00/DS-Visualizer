@@ -284,14 +284,31 @@ const LinkedListVisualizer = () => {
                     </div>
 
                     {node.next && (
-                      <svg className="ll-arrow" width="40" height="20">
+                      <motion.svg 
+                        className="ll-arrow" 
+                        width="40" 
+                        height="20"
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        exit={{ opacity: 0, scaleX: 0 }}
+                        transition={{ duration: 0.3, type: 'spring' }}
+                        style={{ originX: 0 }}
+                      >
                         <defs>
-                          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                          <marker id={`arrowhead-${node.id}`} markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                             <polygon points="0 0, 10 3.5, 0 7" fill="var(--text-secondary)" />
                           </marker>
                         </defs>
-                        <line x1="0" y1="10" x2="35" y2="10" stroke="var(--text-secondary)" strokeWidth="2" markerEnd="url(#arrowhead)" />
-                      </svg>
+                        <motion.line 
+                          x1="0" y1="10" x2="35" y2="10" 
+                          stroke="var(--text-secondary)" 
+                          strokeWidth="2" 
+                          markerEnd={`url(#arrowhead-${node.id})`}
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                        />
+                      </motion.svg>
                     )}
 
                     {!node.next && orderedNodes.includes(node) && (

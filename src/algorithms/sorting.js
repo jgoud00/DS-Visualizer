@@ -18,13 +18,13 @@ export function* bubbleSort(arr) {
     yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [], message: `Starting pass ${i + 1}`, pseudocodeLine: 1, phase: 'pass-start' };
 
     for (let j = 0; j < n - i - 1; j++) {
-      yield { data: [...a], comparing: [j, j + 1], swapping: [], sorted: [...sortedIndices], active: [], message: `Comparing arr[${j}]=${a[j]} and arr[${j + 1}]=${a[j + 1]}`, pseudocodeLine: 4, phase: 'compare' };
+      yield { data: [...a], comparing: [j, j + 1], swapping: [], sorted: [...sortedIndices], active: [], message: `Comparing arr[${j}]=${a[j]?.val ?? a[j]} and arr[${j + 1}]=${a[j + 1]?.val ?? a[j + 1]}`, pseudocodeLine: 4, phase: 'compare' };
 
-      if (a[j] > a[j + 1]) {
-        yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...sortedIndices], active: [], message: `${a[j]} > ${a[j + 1]} — swapping`, pseudocodeLine: 5, phase: 'swap' };
+      if ((a[j]?.val ?? a[j]) > (a[j + 1]?.val ?? a[j + 1])) {
+        yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...sortedIndices], active: [], message: `${a[j]?.val ?? a[j]} > ${a[j + 1]?.val ?? a[j + 1]} — swapping`, pseudocodeLine: 5, phase: 'swap' };
         [a[j], a[j + 1]] = [a[j + 1], a[j]];
         swapped = true;
-        yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...sortedIndices], active: [], message: `Swapped → arr[${j}]=${a[j]}, arr[${j + 1}]=${a[j + 1]}`, pseudocodeLine: 6, phase: 'swap-done' };
+        yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...sortedIndices], active: [], message: `Swapped → arr[${j}]=${a[j]?.val ?? a[j]}, arr[${j + 1}]=${a[j + 1]?.val ?? a[j + 1]}`, pseudocodeLine: 6, phase: 'swap-done' };
       }
     }
 
@@ -58,25 +58,25 @@ export function* selectionSort(arr) {
   for (let i = 0; i < n - 1; i++) {
     let minIndex = i;
 
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [minIndex], message: `Pass ${i + 1}: assuming arr[${i}]=${a[i]} is the minimum`, pseudocodeLine: 2, phase: 'set-min' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [minIndex], message: `Pass ${i + 1}: assuming arr[${i}]=${a[i]?.val ?? a[i]} is the minimum`, pseudocodeLine: 2, phase: 'set-min' };
 
     for (let j = i + 1; j < n; j++) {
-      yield { data: [...a], comparing: [j], swapping: [], sorted: [...sortedIndices], active: [minIndex], message: `Comparing arr[${j}]=${a[j]} with current min arr[${minIndex}]=${a[minIndex]}`, pseudocodeLine: 3, phase: 'compare' };
+      yield { data: [...a], comparing: [j], swapping: [], sorted: [...sortedIndices], active: [minIndex], message: `Comparing arr[${j}]=${a[j]?.val ?? a[j]} with current min arr[${minIndex}]=${a[minIndex]?.val ?? a[minIndex]}`, pseudocodeLine: 3, phase: 'compare' };
 
-      if (a[j] < a[minIndex]) {
+      if ((a[j]?.val ?? a[j]) < (a[minIndex]?.val ?? a[minIndex])) {
         minIndex = j;
-        yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [minIndex], message: `New minimum found: arr[${minIndex}]=${a[minIndex]}`, pseudocodeLine: 5, phase: 'new-min' };
+        yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [minIndex], message: `New minimum found: arr[${minIndex}]=${a[minIndex]?.val ?? a[minIndex]}`, pseudocodeLine: 5, phase: 'new-min' };
       }
     }
 
     if (minIndex !== i) {
-      yield { data: [...a], comparing: [], swapping: [i, minIndex], sorted: [...sortedIndices], active: [], message: `Swapping arr[${i}]=${a[i]} with arr[${minIndex}]=${a[minIndex]}`, pseudocodeLine: 6, phase: 'swap' };
+      yield { data: [...a], comparing: [], swapping: [i, minIndex], sorted: [...sortedIndices], active: [], message: `Swapping arr[${i}]=${a[i]?.val ?? a[i]} with arr[${minIndex}]=${a[minIndex]?.val ?? a[minIndex]}`, pseudocodeLine: 6, phase: 'swap' };
       [a[i], a[minIndex]] = [a[minIndex], a[i]];
-      yield { data: [...a], comparing: [], swapping: [i, minIndex], sorted: [...sortedIndices], active: [], message: `Swapped → arr[${i}]=${a[i]}`, pseudocodeLine: 6, phase: 'swap-done' };
+      yield { data: [...a], comparing: [], swapping: [i, minIndex], sorted: [...sortedIndices], active: [], message: `Swapped → arr[${i}]=${a[i]?.val ?? a[i]}`, pseudocodeLine: 6, phase: 'swap-done' };
     }
 
     sortedIndices.push(i);
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [], message: `Position ${i} is now sorted with value ${a[i]}`, pseudocodeLine: 6, phase: 'mark-sorted' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [], message: `Position ${i} is now sorted with value ${a[i]?.val ?? a[i]}`, pseudocodeLine: 6, phase: 'mark-sorted' };
   }
 
   sortedIndices.push(n - 1);
@@ -105,10 +105,10 @@ export function* insertionSort(arr) {
     yield { data: [...a], comparing: [], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `Picking key = arr[${i}] = ${key}`, pseudocodeLine: 2, phase: 'pick-key' };
 
     while (j >= 0 && a[j] > key) {
-      yield { data: [...a], comparing: [j], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `arr[${j}]=${a[j]} > key=${key} — shifting arr[${j}] right`, pseudocodeLine: 4, phase: 'compare-shift' };
+      yield { data: [...a], comparing: [j], swapping: [], sorted: [...Array(i).keys()], active: [i], message: `arr[${j}]=${a[j]?.val ?? a[j]} > key=${key} — shifting arr[${j}] right`, pseudocodeLine: 4, phase: 'compare-shift' };
 
       a[j + 1] = a[j];
-      yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...Array(i).keys()], active: [], message: `Shifted arr[${j}]=${a[j]} to position ${j + 1}`, pseudocodeLine: 5, phase: 'shift' };
+      yield { data: [...a], comparing: [], swapping: [j, j + 1], sorted: [...Array(i).keys()], active: [], message: `Shifted arr[${j}]=${a[j]?.val ?? a[j]} to position ${j + 1}`, pseudocodeLine: 5, phase: 'shift' };
 
       j--;
     }
@@ -136,7 +136,7 @@ export function* mergeSort(arr) {
 
   function* mergeSortHelper(left, right) {
     if (left >= right) {
-      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [left], message: `Base case: subarray [${left}] has one element (${a[left]})`, pseudocodeLine: 1, phase: 'base-case' };
+      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [left], message: `Base case: subarray [${left}] has one element (${a[left]?.val ?? a[left]})`, pseudocodeLine: 1, phase: 'base-case' };
       return;
     }
 
@@ -161,15 +161,15 @@ export function* mergeSort(arr) {
     let i = 0, j = 0, k = left;
 
     while (i < L.length && j < R.length) {
-      yield { data: [...a], comparing: [left + i, mid + 1 + j], swapping: [], sorted: [...sortedIndices], active: [k], message: `Comparing L[${i}]=${L[i]} with R[${j}]=${R[j]}`, pseudocodeLine: 10, phase: 'merge-compare' };
+      yield { data: [...a], comparing: [left + i, mid + 1 + j], swapping: [], sorted: [...sortedIndices], active: [k], message: `Comparing L[${i}]=${L[i]?.val ?? L[i]} with R[${j}]=${R[j]?.val ?? R[j]}`, pseudocodeLine: 10, phase: 'merge-compare' };
 
-      if (L[i] <= R[j]) {
+      if ((L[i]?.val ?? L[i]) <= (R[j]?.val ?? R[j])) {
         a[k] = L[i];
-        yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Placing ${L[i]} at position ${k}`, pseudocodeLine: 11, phase: 'merge-place' };
+        yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Placing ${L[i]?.val ?? L[i]} at position ${k}`, pseudocodeLine: 11, phase: 'merge-place' };
         i++;
       } else {
         a[k] = R[j];
-        yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Placing ${R[j]} at position ${k}`, pseudocodeLine: 11, phase: 'merge-place' };
+        yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Placing ${R[j]?.val ?? R[j]} at position ${k}`, pseudocodeLine: 11, phase: 'merge-place' };
         j++;
       }
       k++;
@@ -177,14 +177,14 @@ export function* mergeSort(arr) {
 
     while (i < L.length) {
       a[k] = L[i];
-      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Copying remaining L[${i}]=${L[i]} to position ${k}`, pseudocodeLine: 12, phase: 'merge-copy-remaining' };
+      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Copying remaining L[${i}]=${L[i]?.val ?? L[i]} to position ${k}`, pseudocodeLine: 12, phase: 'merge-copy-remaining' };
       i++;
       k++;
     }
 
     while (j < R.length) {
       a[k] = R[j];
-      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Copying remaining R[${j}]=${R[j]} to position ${k}`, pseudocodeLine: 12, phase: 'merge-copy-remaining' };
+      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [k], message: `Copying remaining R[${j}]=${R[j]?.val ?? R[j]} to position ${k}`, pseudocodeLine: 12, phase: 'merge-copy-remaining' };
       j++;
       k++;
     }
@@ -218,33 +218,33 @@ export function* quickSort(arr) {
   function* partition(low, high) {
     const pivot = a[high];
 
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [high], message: `Pivot selected: arr[${high}]=${pivot}`, pseudocodeLine: 7, phase: 'pivot-select' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [high], message: `Pivot selected: arr[${high}]=${pivot?.val ?? pivot}`, pseudocodeLine: 7, phase: 'pivot-select' };
 
     let i = low - 1;
 
     for (let j = low; j < high; j++) {
-      yield { data: [...a], comparing: [j, high], swapping: [], sorted: [...sortedIndices], active: [high], message: `Comparing arr[${j}]=${a[j]} with pivot=${pivot}`, pseudocodeLine: 9, phase: 'partition-compare' };
+      yield { data: [...a], comparing: [j, high], swapping: [], sorted: [...sortedIndices], active: [high], message: `Comparing arr[${j}]=${a[j]?.val ?? a[j]} with pivot=${pivot?.val ?? pivot}`, pseudocodeLine: 9, phase: 'partition-compare' };
 
-      if (a[j] <= pivot) {
+      if ((a[j]?.val ?? a[j]) <= (pivot?.val ?? pivot)) {
         i++;
         if (i !== j) {
-          yield { data: [...a], comparing: [], swapping: [i, j], sorted: [...sortedIndices], active: [high], message: `${a[j]} ≤ ${pivot} — swapping arr[${i}]=${a[i]} and arr[${j}]=${a[j]}`, pseudocodeLine: 11, phase: 'partition-swap' };
+          yield { data: [...a], comparing: [], swapping: [i, j], sorted: [...sortedIndices], active: [high], message: `${a[j]?.val ?? a[j]} ≤ ${pivot?.val ?? pivot} — swapping arr[${i}]=${a[i]?.val ?? a[i]} and arr[${j}]=${a[j]?.val ?? a[j]}`, pseudocodeLine: 11, phase: 'partition-swap' };
           [a[i], a[j]] = [a[j], a[i]];
-          yield { data: [...a], comparing: [], swapping: [i, j], sorted: [...sortedIndices], active: [high], message: `Swapped → arr[${i}]=${a[i]}, arr[${j}]=${a[j]}`, pseudocodeLine: 11, phase: 'partition-swap-done' };
+          yield { data: [...a], comparing: [], swapping: [i, j], sorted: [...sortedIndices], active: [high], message: `Swapped → arr[${i}]=${a[i]?.val ?? a[i]}, arr[${j}]=${a[j]?.val ?? a[j]}`, pseudocodeLine: 11, phase: 'partition-swap-done' };
         } else {
-          yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [high], message: `${a[j]} ≤ ${pivot} — already in place`, pseudocodeLine: 10, phase: 'partition-no-swap' };
+          yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [high], message: `${a[j]?.val ?? a[j]} ≤ ${pivot?.val ?? pivot} — already in place`, pseudocodeLine: 10, phase: 'partition-no-swap' };
         }
       }
     }
 
     const pivotPos = i + 1;
     if (pivotPos !== high) {
-      yield { data: [...a], comparing: [], swapping: [pivotPos, high], sorted: [...sortedIndices], active: [], message: `Placing pivot ${pivot} at position ${pivotPos}`, pseudocodeLine: 12, phase: 'pivot-place' };
+      yield { data: [...a], comparing: [], swapping: [pivotPos, high], sorted: [...sortedIndices], active: [], message: `Placing pivot ${pivot?.val ?? pivot} at position ${pivotPos}`, pseudocodeLine: 12, phase: 'pivot-place' };
       [a[pivotPos], a[high]] = [a[high], a[pivotPos]];
     }
 
     sortedIndices.add(pivotPos);
-    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [pivotPos], message: `Pivot ${pivot} is now at its final position ${pivotPos}`, pseudocodeLine: 13, phase: 'pivot-final' };
+    yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [pivotPos], message: `Pivot ${pivot?.val ?? pivot} is now at its final position ${pivotPos}`, pseudocodeLine: 13, phase: 'pivot-final' };
 
     return pivotPos;
   }
@@ -259,7 +259,7 @@ export function* quickSort(arr) {
       yield* qs(pi + 1, high);
     } else if (low === high) {
       sortedIndices.add(low);
-      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [low], message: `Single element arr[${low}]=${a[low]} is in its final position`, pseudocodeLine: 1, phase: 'base-case' };
+      yield { data: [...a], comparing: [], swapping: [], sorted: [...sortedIndices], active: [low], message: `Single element arr[${low}]=${a[low]?.val ?? a[low]} is in its final position`, pseudocodeLine: 1, phase: 'base-case' };
     }
   }
 

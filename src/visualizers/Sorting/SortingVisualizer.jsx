@@ -30,7 +30,7 @@ const COMPLEXITY = {
 };
 
 const generateRandomArray = (size) =>
-  Array.from({ length: size }, () => Math.floor(Math.random() * 90) + 10);
+  Array.from({ length: size }, () => Math.floor(Math.random() * 90) + 10).map(val => ({ id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9), val }));
 
 const SortingVisualizer = () => {
   const visualizer = useVisualizer();
@@ -59,7 +59,7 @@ const SortingVisualizer = () => {
   const active = currentStepData?.active ?? [];
   const sorted = currentStepData?.sorted ?? [];
 
-  const maxVal = useMemo(() => Math.max(...displayArray, 1), [displayArray]);
+  const maxVal = useMemo(() => Math.max(...displayArray.map(item => item.val ?? item), 1), [displayArray]);
 
   const getBarColor = (idx) => {
     if (sorted.includes(idx)) return 'success';
@@ -132,14 +132,20 @@ const SortingVisualizer = () => {
 
         <div className="sorting-canvas">
           <AnimatePresence>
-            {displayArray.map((val, idx) => {
+            {displayArray.map((item, idx) => {
+              const val = item.val !== undefined ? item.val : item;
+              const itemId = item.id !== undefined ? item.id : `bar-${idx}`;
               const state = getBarColor(idx);
+              const isSwapping = swapping.includes(idx);
+              const isComparing = comparing.includes(idx);
+
               return (
                 <motion.div
-                  key={`bar-${idx}`}
+                  key={itemId}
                   layout
                   className={`sort-bar ${state}`}
                   style={{ height: `${(val / maxVal) * 100}%`, flex: 1, maxWidth: '40px' }}
+                  animate={{ scale: isSwapping ? 1.05 : isComparing ? 1.02 : 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 >
                   {arraySize <= 25 && <span className="sort-val">{val}</span>}

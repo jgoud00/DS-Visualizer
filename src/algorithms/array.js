@@ -25,7 +25,7 @@ const SEARCH_PSEUDOCODE = [
   '  return -1  // not found',
 ];
 
-export function* arrayInsert({ arr, index, value }) {
+export function* arrayInsert({ arr, index, item }) {
   const a = [...arr];
 
   if (index < 0 || index > a.length) {
@@ -41,7 +41,7 @@ export function* arrayInsert({ arr, index, value }) {
   yield {
     data: [...a],
     active: [index],
-    message: `Inserting value ${value} at index ${index}. Array length = ${a.length}.`,
+    message: `Inserting value ${item?.val ?? item} at index ${index}. Array length = ${a.length}.`,
     pseudocodeLine: 0,
     phase: 'Validate',
     pointers: { target: index },
@@ -52,17 +52,17 @@ export function* arrayInsert({ arr, index, value }) {
     yield {
       data: [...a],
       swapping: [i, i + 1],
-      message: `Shift arr[${i}] (${a[i + 1]}) → arr[${i + 1}].`,
+      message: `Shift arr[${i}] (${a[i + 1]?.val ?? a[i + 1]}) → arr[${i + 1}].`,
       pseudocodeLine: 3,
       phase: 'Shift Right',
     };
   }
 
-  a[index] = value;
+  a[index] = item;
   yield {
     data: [...a],
     active: [index],
-    message: `Placed value ${value} at index ${index}.`,
+    message: `Placed value ${item?.val ?? item} at index ${index}.`,
     pseudocodeLine: 4,
     phase: 'Place',
   };
@@ -93,7 +93,7 @@ export function* arrayDelete({ arr, index }) {
   yield {
     data: [...a],
     active: [index],
-    message: `Targeting element arr[${index}] = ${target} for deletion.`,
+    message: `Targeting element arr[${index}] = ${target?.val ?? target} for deletion.`,
     pseudocodeLine: 2,
     phase: 'Target',
     pointers: { target: index },
@@ -104,7 +104,7 @@ export function* arrayDelete({ arr, index }) {
     yield {
       data: [...a],
       swapping: [i, i + 1],
-      message: `Shift arr[${i + 1}] (${a[i]}) → arr[${i}].`,
+      message: `Shift arr[${i + 1}] (${a[i]?.val ?? a[i]}) → arr[${i}].`,
       pseudocodeLine: 4,
       phase: 'Shift Left',
     };
@@ -113,7 +113,7 @@ export function* arrayDelete({ arr, index }) {
   a.pop();
   yield {
     data: [...a],
-    message: `Removed duplicate last element. Value ${target} deleted.`,
+    message: `Removed duplicate last element. Value ${target?.val ?? target} deleted.`,
     pseudocodeLine: 5,
     phase: 'Remove',
   };
@@ -140,16 +140,17 @@ export function* arrayLinearSearch({ arr, target }) {
   }
 
   for (let i = 0; i < a.length; i++) {
+    const currVal = a[i]?.val !== undefined ? a[i].val : a[i];
     yield {
       data: [...a],
       comparing: [i],
-      message: `Comparing arr[${i}] = ${a[i]} with target ${target}.`,
+      message: `Comparing arr[${i}] = ${currVal} with target ${target}.`,
       pseudocodeLine: 2,
       phase: 'Search',
       pointers: { i },
     };
 
-    if (a[i] === target) {
+    if (currVal === target) {
       yield {
         data: [...a],
         active: [i],
