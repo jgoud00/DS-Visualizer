@@ -64,8 +64,7 @@ const SearchingVisualizer = () => {
       return;
     }
     const fn = algorithm === 'linear' ? linearSearch : binarySearch;
-    visualizer.loadSteps(fn, { arr: [...baseArray], target: val });
-    visualizer.play();
+    visualizer.loadStepsAndPlay(fn, { arr: [...baseArray], target: val });
   };
 
   const displayArray = currentStepData?.data ?? baseArray;

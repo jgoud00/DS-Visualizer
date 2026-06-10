@@ -53,8 +53,11 @@ const SortingVisualizer = () => {
   };
 
   const onPlay = () => {
-    if (steps.length === 0) handleSort();
-    visualizer.play();
+    if (steps.length === 0) {
+      visualizer.loadStepsAndPlay(ALGORITHMS[algorithm].fn, [...baseArray]);
+    } else {
+      visualizer.play();
+    }
   };
 
   const displayArray = currentStepData?.data ?? baseArray;
