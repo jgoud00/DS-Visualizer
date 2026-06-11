@@ -6,11 +6,11 @@ import { bubbleSort, selectionSort, insertionSort, mergeSort, quickSort } from '
 import './SortingVisualizer.css';
 
 const ALGORITHMS = {
-  bubble: { fn: bubbleSort, label: 'Bubble Sort' },
-  selection: { fn: selectionSort, label: 'Selection Sort' },
-  insertion: { fn: insertionSort, label: 'Insertion Sort' },
-  merge: { fn: mergeSort, label: 'Merge Sort' },
-  quick: { fn: quickSort, label: 'Quick Sort' },
+  bubble: { endpoint: '/api/sort/bubble', label: 'Bubble Sort' },
+  selection: { endpoint: '/api/sort/selection', label: 'Selection Sort' },
+  insertion: { endpoint: '/api/sort/insertion', label: 'Insertion Sort' },
+  merge: { endpoint: '/api/sort/merge', label: 'Merge Sort' },
+  quick: { endpoint: '/api/sort/quick', label: 'Quick Sort' },
 };
 
 const PSEUDOCODE = {
@@ -48,13 +48,35 @@ const SortingVisualizer = () => {
     visualizer.clear();
   }, [baseArray, algorithm]);
 
-  const handleSort = () => {
-    visualizer.loadSteps(ALGORITHMS[algorithm].fn, [...baseArray]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchFrames = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000${ALGORITHMS[algorithm].endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ array: baseArray })
+      });
+      const data = await response.json();
+      return data.frames || [];
+    } catch (error) {
+      console.error("Failed to fetch frames from Python backend", error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onPlay = () => {
+  const handleSort = async () => {
+    const frames = await fetchFrames();
+    visualizer.loadFrames(frames);
+  };
+
+  const onPlay = async () => {
     if (steps.length === 0) {
-      visualizer.loadStepsAndPlay(ALGORITHMS[algorithm].fn, [...baseArray]);
+      const frames = await fetchFrames();
+      visualizer.loadFramesAndPlay(frames);
     } else {
       visualizer.play();
     }
@@ -95,6 +117,7 @@ const SortingVisualizer = () => {
         speed: visualizer.speed,
         totalSteps: steps.length,
         currentStep: visualizer.currentStep,
+        disabled: isLoading,
       }}
       infoPanelProps={{
         pseudocode: PSEUDOCODE[algorithm],

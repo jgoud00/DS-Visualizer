@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Box, List, Layers, ArrowRightLeft, Network, GitMerge, Search, Share2 } from 'lucide-react';
+import { Box, List, Layers, ArrowRightLeft, Network, GitMerge, Search, Share2, MapPin } from 'lucide-react';
 import './Sidebar.css';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { path: '/graph', label: 'Graph', icon: Share2 },
   { path: '/sorting', label: 'Sorting', icon: GitMerge },
   { path: '/searching', label: 'Searching', icon: Search },
+  { path: '/city-pathfinding', label: 'City Pathfinding', icon: MapPin },
 ];
 
 const Sidebar = () => {

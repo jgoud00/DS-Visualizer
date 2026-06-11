@@ -12,6 +12,7 @@ const SearchingVisualizer = lazy(() => import('./visualizers/Searching/Searching
 const LinkedListVisualizer = lazy(() => import('./visualizers/LinkedList/LinkedListVisualizer'));
 const BSTVisualizer = lazy(() => import('./visualizers/BST/BSTVisualizer'));
 const GraphVisualizer = lazy(() => import('./visualizers/Graph/GraphVisualizer'));
+const CityPathfinding = lazy(() => import('./components/CityPathfinding/CityPathfinding'));
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="graph" element={<GraphVisualizer />} />
           <Route path="sorting" element={<SortingVisualizer />} />
           <Route path="searching" element={<SearchingVisualizer />} />
+          <Route path="city-pathfinding" element={<CityPathfinding />} />
         </Route>
       </Routes>
     </Suspense>

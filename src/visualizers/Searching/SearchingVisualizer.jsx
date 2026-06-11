@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useVisualizer } from '../../hooks/useVisualizer';
 import VisualizerLayout from '../../components/VisualizerLayout/VisualizerLayout';
-import { linearSearch, binarySearch } from '../../algorithms/searching';
 import './SearchingVisualizer.css';
 
 const PSEUDOCODE = {
@@ -57,19 +56,40 @@ const SearchingVisualizer = () => {
     visualizer.reset();
   };
 
-  const handleSearch = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchFrames = async (val) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/search/${algorithm}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ array: baseArray, target: val })
+      });
+      const data = await response.json();
+      return data.frames || [];
+    } catch (error) {
+      console.error("Failed to fetch frames from Python backend", error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
     const val = parseInt(target);
     if (isNaN(val)) {
       alert('Please enter a target number to search for.');
       return;
     }
-    const fn = algorithm === 'linear' ? linearSearch : binarySearch;
-    visualizer.loadStepsAndPlay(fn, { arr: [...baseArray], target: val });
+    const frames = await fetchFrames(val);
+    visualizer.loadFramesAndPlay(frames);
   };
 
   const displayArray = currentStepData?.data ?? baseArray;
   const comparing = currentStepData?.comparing ?? [];
   const active = currentStepData?.active ?? [];
+  const found = currentStepData?.found ?? [];
   const eliminated = currentStepData?.eliminated ?? [];
   const pointers = currentStepData?.pointers ?? {};
 
@@ -79,8 +99,9 @@ const SearchingVisualizer = () => {
   );
 
   const getBoxState = (idx) => {
-    if (active.includes(idx)) return 'success';
+    if (found.includes(idx)) return 'success';
     if (comparing.includes(idx)) return 'comparing';
+    if (active.includes(idx)) return 'active';
     return 'default';
   };
 

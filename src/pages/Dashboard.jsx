@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Box, Layers, ArrowRightLeft, Network, GitMerge, Search, Share2 } from 'lucide-react';
+import { Box, Layers, ArrowRightLeft, Network, GitMerge, Search, Share2, MapPin } from 'lucide-react';
 import './Dashboard.css';
 
 const cards = [
@@ -13,6 +13,7 @@ const cards = [
   { path: '/graph', title: 'Graph', icon: Share2, desc: 'Vertices and edges, visualize BFS and DFS.' },
   { path: '/sorting', title: 'Sorting', icon: GitMerge, desc: 'Compare different sorting algorithms like Bubble, Merge, Quick Sort.' },
   { path: '/searching', title: 'Searching', icon: Search, desc: 'Visualize Linear and Binary Search algorithms.' },
+  { path: '/city-pathfinding', title: 'City Pathfinding', icon: MapPin, desc: 'Find shortest routes between city landmarks using Dijkstra & A*', badge: 'New' },
 ];
 
 const containerVariants = {
@@ -50,7 +51,10 @@ const Dashboard = () => {
               <div className="card-icon-wrapper">
                 <card.icon size={24} className="card-icon" />
               </div>
-              <h3>{card.title}</h3>
+              <h3>
+                {card.title}
+                {card.badge && <span style={{fontSize: '0.6rem', backgroundColor: '#fbbf24', color: '#000', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px', verticalAlign: 'middle'}}>{card.badge}</span>}
+              </h3>
               <p>{card.desc}</p>
             </Link>
           </motion.div>

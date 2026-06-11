@@ -65,7 +65,36 @@ export const useVisualizer = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   }, [pause]);
 
-    const loadStepsAndPlay = useCallback((generatorFn, input) => {
+  const loadFramesAndPlay = useCallback((frames) => {
+    pause();
+    stepsRef.current = frames;
+    setSteps(frames);
+    setCurrentStep(0);
+    
+    if (frames.length > 0) {
+      setIsPlaying(true);
+      clearTimer();
+      const delay = 1000 / speed;
+      timerRef.current = setInterval(() => {
+        setCurrentStep(prev => {
+          if (prev >= frames.length - 1) {
+            pause();
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, delay);
+    }
+  }, [pause, clearTimer, speed]);
+
+  const loadFrames = useCallback((frames) => {
+    pause();
+    stepsRef.current = frames;
+    setSteps(frames);
+    setCurrentStep(0);
+  }, [pause]);
+
+  const loadStepsAndPlay = useCallback((generatorFn, input) => {
     pause();
     const generator = generatorFn(input);
     const collectedSteps = [];
@@ -134,6 +163,8 @@ export const useVisualizer = () => {
     stepBackward,
     loadSteps,
     loadStepsAndPlay,
+    loadFrames,
+    loadFramesAndPlay,
     currentStepData: steps[currentStep] || null
   };
 };
