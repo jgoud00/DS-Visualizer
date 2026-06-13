@@ -315,7 +315,7 @@ async function runAstar(){
   const positions = getGraphPositions('as', asGraph);
   
   try {
-      const res=await fetch('/astar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({graph:asGraph,positions,start,end})});
+      const res=await fetch('/api/astar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({graph:asGraph,positions,start,end})});
       const d=await res.json();
       
       document.getElementById('as-tcplx').textContent=d.complexity_time;
@@ -344,7 +344,7 @@ async function runIdastar(){
   const positions = getGraphPositions('ida', idaGraph);
   
   try {
-      const res=await fetch('/idastar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({graph:idaGraph,positions,start,end})});
+      const res=await fetch('/api/idastar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({graph:idaGraph,positions,start,end})});
       const d=await res.json();
       
       document.getElementById('ida-tcplx').textContent=d.complexity_time;

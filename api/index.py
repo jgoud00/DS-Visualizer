@@ -1,20 +1,10 @@
-import os
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import heapq
 import math
 
 app = FastAPI()
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Mount static and templates
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 class Edge(BaseModel):
     node: str
@@ -35,14 +25,9 @@ def heuristic(a: str, b: str, positions: Dict[str, NodeData]) -> float:
         return 0.0
     p1 = positions[a]
     p2 = positions[b]
-    # Scale down Euclidean distance to match typical weights (e.g., divided by 20)
     return math.hypot(p1.x - p2.x, p1.y - p2.y) / 20.0
 
-@app.get("/", response_class=HTMLResponse)
-def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.post("/astar")
+@app.post("/api/astar")
 def astar(req: GraphRequest):
     graph = req.graph
     positions = req.positions
@@ -119,7 +104,7 @@ def astar(req: GraphRequest):
             "complexity_time":"O((V+E) log V)","complexity_space":"O(V)",
             "message":f"No path from '{start}' to '{end}'. Explored {len(closed_set)} nodes."}
 
-@app.post("/idastar")
+@app.post("/api/idastar")
 def idastar(req: GraphRequest):
     graph = req.graph
     positions = req.positions
@@ -173,7 +158,6 @@ def idastar(req: GraphRequest):
     for _ in range(500):
         t, result = search(path, 0, bound)
         if t == -1:
-            # Reconstruct cost
             cost = 0
             for i in range(len(result)-1):
                 curr = result[i]
@@ -195,3 +179,4 @@ def idastar(req: GraphRequest):
             "path_length":0,"nodes_explored":nodes_explored[0],
             "complexity_time":"O(b^d) per iteration","complexity_space":"O(d)",
             "message":f"No path from '{start}' to '{end}'."}
+
