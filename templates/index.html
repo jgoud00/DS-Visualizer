@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Premium DSA Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+<header>
+  <div class="logo">⬡</div>
+  <h1>DSA <span>Visualizer</span></h1>
+  <p>A* & IDA* Pathfinding Engine</p>
+</header>
+
+<div class="tabs glass-panel-flat">
+  <button class="tab-btn active" onclick="switchTab('astar',this)">A* Algorithm</button>
+  <button class="tab-btn" onclick="switchTab('idastar',this)">IDA* Algorithm</button>
+</div>
+
+<div class="content">
+
+<div id="tab-astar" class="tab-panel active">
+  <div class="panel glass-panel">
+    <h2>Add Weighted Edge</h2>
+    <div class="hint">Type node names (e.g. A, B). Edges are directed.</div>
+    <div class="edge-row">
+      <input id="as-from" placeholder="From" maxlength="4"/>
+      <span class="edge-arrow">→</span>
+      <input id="as-to" placeholder="To" maxlength="4"/>
+      <input id="as-weight" type="number" placeholder="Wt" value="10" min="1" style="width: 50px;"/>
+      <button class="btn btn-primary" style="padding:7px 12px" onclick="asAddEdge()">Add</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Start / End Nodes</h2>
+    <div class="edge-row">
+      <input id="as-start" placeholder="Start" maxlength="4" style="flex:1"/>
+      <input id="as-end" placeholder="End" maxlength="4" style="flex:1"/>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="btn btn-green" onclick="runAstar()">▶ Run A* Pathfinding</button>
+      <button class="btn btn-secondary" onclick="asLoadExample()">Load Example Graph</button>
+      <button class="btn btn-secondary" onclick="asGenerateRandom()">Random Graph</button>
+      <button class="btn btn-danger" onclick="asReset()">Clear Graph</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Results</h2>
+    <div class="card"><div class="label">Time Complexity</div><div class="value" id="as-tcplx">—</div></div>
+    <div class="card"><div class="label">Space Complexity</div><div class="value" id="as-scplx">—</div></div>
+    <div class="card"><div class="label">Nodes Explored</div><div class="value" id="as-nodes">—</div></div>
+    <div class="card"><div class="label">Path</div><div class="value" id="as-path-val">—</div></div>
+    <div class="log-box" id="as-log">Add edges, set start &amp; end, then run.</div>
+  </div>
+  <div class="viz">
+    <div class="viz-header">
+      <div class="viz-title">A* Search Visualization</div>
+    </div>
+    <div id="as-graph-wrap" class="glass-panel"></div>
+  </div>
+</div>
+
+<div id="tab-idastar" class="tab-panel">
+  <div class="panel glass-panel">
+    <h2>Add Weighted Edge</h2>
+    <div class="hint">Type node names (e.g. A, B). Edges are directed.</div>
+    <div class="edge-row">
+      <input id="ida-from" placeholder="From" maxlength="4"/>
+      <span class="edge-arrow">→</span>
+      <input id="ida-to" placeholder="To" maxlength="4"/>
+      <input id="ida-weight" type="number" placeholder="Wt" value="10" min="1" style="width: 50px;"/>
+      <button class="btn btn-primary" style="padding:7px 12px" onclick="idaAddEdge()">Add</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Start / End Nodes</h2>
+    <div class="edge-row">
+      <input id="ida-start" placeholder="Start" maxlength="4" style="flex:1"/>
+      <input id="ida-end" placeholder="End" maxlength="4" style="flex:1"/>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="btn btn-cyan" onclick="runIdastar()">▶ Run IDA* Pathfinding</button>
+      <button class="btn btn-secondary" onclick="idaLoadExample()">Load Example Graph</button>
+      <button class="btn btn-secondary" onclick="idaGenerateRandom()">Random Graph</button>
+      <button class="btn btn-danger" onclick="idaReset()">Clear Graph</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Results</h2>
+    <div class="card"><div class="label">Time Complexity</div><div class="value" id="ida-tcplx">—</div></div>
+    <div class="card"><div class="label">Space Complexity</div><div class="value" id="ida-scplx">—</div></div>
+    <div class="card"><div class="label">Nodes Explored</div><div class="value" id="ida-nodes">—</div></div>
+    <div class="card"><div class="label">Path</div><div class="value" id="ida-path-val">—</div></div>
+    <div class="log-box" id="ida-log">Add edges, set start &amp; end, then run.</div>
+  </div>
+  <div class="viz">
+    <div class="viz-header">
+      <div class="viz-title">IDA* Search Visualization</div>
+    </div>
+    <div id="ida-graph-wrap" class="glass-panel"></div>
+  </div>
+</div>
+
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
