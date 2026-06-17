@@ -25,7 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Background aesthetic shapes */
@@ -104,17 +104,18 @@ header p { font-size: 13px; color: var(--muted); margin-left: auto; font-weight:
 .tab-btn:hover { color: var(--text); }
 .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
 
-.content { display: flex; flex: 1; overflow: hidden; z-index: 10;}
+.content { display: flex; flex: 1; z-index: 10; flex-wrap: wrap; }
 .tab-panel { display: none; flex: 1; height: 100%;}
 .tab-panel.active { display: flex; }
 
 .panel {
-  width: 320px; min-width: 320px; padding: 24px;
+  width: 340px; min-width: 340px; padding: 24px;
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column; gap: 16px;
   overflow-y: auto;
   background: var(--surface);
   backdrop-filter: var(--glass-blur);
+  flex-shrink: 0;
 }
 
 .glass-panel {
@@ -128,7 +129,9 @@ header p { font-size: 13px; color: var(--muted); margin-left: auto; font-weight:
 
 .panel h2 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
 
-.btn-group { display: flex; flex-direction: column; gap: 10px; }
+.btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-group button:first-child { grid-column: span 2; }
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn {
   padding: 10px 16px; border: none; border-radius: 8px;
   font-family: var(--sans); font-size: 13px; font-weight: 600;
@@ -149,7 +152,7 @@ header p { font-size: 13px; color: var(--muted); margin-left: auto; font-weight:
 
 .card { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; font-family: var(--mono); }
-.card .value { font-family: var(--mono); font-size: 13px; color: var(--accent2); font-weight: 600; line-height: 1.5; word-break: break-all; }
+.card .value { font-family: var(--mono); font-size: 13px; color: var(--accent2); font-weight: 600; line-height: 1.5; word-break: break-word; }
 
 .log-box {
   background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); border-radius: 10px;
@@ -172,14 +175,15 @@ header p { font-size: 13px; color: var(--muted); margin-left: auto; font-weight:
 .edge-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(99,102,241,0.2); }
 .edge-arrow { color: var(--muted); font-size: 16px; }
 
-.viz { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.viz { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; min-width: 0; min-height: 600px; }
 .viz-header { display: flex; justify-content: space-between; align-items: center;}
 .viz-title { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
 
-#as-graph-wrap, #ida-graph-wrap {
+#as-graph-wrap, #ida-graph-wrap, #bfs-graph-wrap, #dfs-graph-wrap {
   flex: 1; width: 100%; border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden; position: relative;
+  min-height: 400px;
 }
 
 svg { overflow: visible; width: 100%; height: 100%; }
@@ -188,3 +192,226 @@ svg { overflow: visible; width: 100%; height: 100%; }
 circle { transition: fill 0.3s, stroke 0.3s; }
 line { transition: stroke 0.3s, stroke-width 0.3s; }
 polygon { transition: fill 0.3s; }
+
+/* ===================================================
+   TASK 3 — DARK / LIGHT MODE
+   =================================================== */
+:root {
+  --sort-default: rgba(99, 102, 241, 0.6);
+  --sort-compare: #f59e0b;
+  --sort-swap: #10b981;
+  --sort-sorted: #22d3ee;
+  --sort-pivot: #ef4444;
+}
+
+:root.light {
+  --bg: #f1f5f9;
+  --surface: rgba(255, 255, 255, 0.85);
+  --border: rgba(203, 213, 225, 0.8);
+  --text: #0f172a;
+  --muted: #64748b;
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 8px 32px 0 rgba(100, 116, 139, 0.18);
+  --sort-default: rgba(99, 102, 241, 0.5);
+}
+
+:root.light body { background: var(--bg); }
+:root.light header { background: rgba(241, 245, 249, 0.85); }
+:root.light .tabs { background: rgba(241, 245, 249, 0.85); }
+:root.light .log-box { background: rgba(241, 245, 249, 0.9); }
+:root.light .card { background: rgba(226, 232, 240, 0.7); }
+:root.light .btn-secondary { background: rgba(226, 232, 240, 0.8); color: var(--text); }
+:root.light .btn-danger { background: transparent; }
+:root.light .edge-row input { background: rgba(226, 232, 240, 0.9); color: var(--text); }
+:root.light .bg-shape-1 { background: rgba(99, 102, 241, 0.12); }
+:root.light .bg-shape-2 { background: rgba(34, 211, 238, 0.12); }
+
+.theme-toggle-btn { font-size: 16px; padding: 8px 12px; }
+
+/* ===================================================
+   TASK 4 & 5 — ANIM CONTROLS (PAUSE / STEP)
+   =================================================== */
+.anim-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.anim-controls .btn { padding: 7px 13px; font-size: 12px; }
+
+.step-btn {
+  display: none;
+  font-size: 14px;
+  padding: 7px 10px;
+}
+
+.step-btn.visible { display: flex; }
+
+/* ===================================================
+   TASK 1 — SORTING VISUALIZER
+   =================================================== */
+#sort-canvas-wrap {
+  flex: 1;
+  width: 100%;
+  border-radius: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  min-height: 400px;
+  padding: 16px 16px 0;
+}
+
+.sort-bars-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  padding-bottom: 0;
+}
+
+.sort-bar {
+  flex: 1;
+  min-width: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--sort-default);
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.sort-bar.comparing { background: var(--sort-compare); }
+.sort-bar.swapping  { background: var(--sort-swap); }
+.sort-bar.sorted    { background: var(--sort-sorted); }
+.sort-bar.pivot     { background: var(--sort-pivot); }
+
+.sort-algo-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sort-algo-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.sort-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sort-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.sort-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ===================================================
+   TASK 2 — TREE VISUALIZER
+   =================================================== */
+#tree-graph-wrap {
+  flex: 1;
+  width: 100%;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  min-height: 400px;
+}
+
+.rotation-label {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: var(--yellow);
+  animation: pulse-border 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-border {
+  from { border-color: rgba(245, 158, 11, 0.3); }
+  to   { border-color: rgba(245, 158, 11, 0.8); }
+}
+
+/* ===================================================
+   TASK 6 — ALGORITHM INFO PANEL
+   =================================================== */
+.info-panel {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.info-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent2);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.info-panel-header:hover { background: rgba(34, 211, 238, 0.06); }
+
+.info-chevron {
+  transition: transform 0.25s;
+  font-size: 14px;
+}
+
+.info-panel.collapsed .info-chevron { transform: rotate(-90deg); }
+.info-panel.collapsed .info-panel-body { display: none; }
+
+.info-panel-body {
+  padding: 0 14px 14px;
+}
+
+.info-complexity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.info-complexity-grid .card { padding: 10px 12px; }
+.info-complexity-grid .card .label { font-size: 9px; }
+.info-complexity-grid .card .value { font-size: 11px; }
+
+.info-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  font-family: var(--sans);
+}
+
+.glass-panel-flat {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(10px);
+}

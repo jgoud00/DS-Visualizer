@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Premium DSA Visualizer</title>
+<meta name="description" content="Interactive visualizer for graph pathfinding (A*, IDA*, BFS, DFS), sorting algorithms, and tree data structures with step-by-step animations."/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/styles.css">
 </head>
@@ -14,16 +15,33 @@
 <header>
   <div class="logo">⬡</div>
   <h1>DSA <span>Visualizer</span></h1>
-  <p>A* & IDA* Pathfinding Engine</p>
+  <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+    <p style="margin: 0; font-size: 13px; color: var(--muted); font-weight: 500;">A* · IDA* · BFS · DFS · Sort · Trees</p>
+    <div class="anim-controls" id="anim-controls">
+      <button id="step-back-btn" class="btn btn-secondary step-btn" onclick="stepBack()" disabled title="Step Back">⏮</button>
+      <button id="pause-resume-btn" class="btn btn-secondary" onclick="togglePause()" disabled title="Pause / Resume">⏸ Pause</button>
+      <button id="step-fwd-btn" class="btn btn-secondary step-btn" onclick="stepForward()" disabled title="Step Forward">⏭</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <label for="speed-slider" style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Delay (ms)</label>
+      <input type="range" id="speed-slider" min="50" max="1500" step="50" value="600" style="width: 100px; accent-color: var(--accent2); cursor: pointer;" title="Adjust animation speed"/>
+    </div>
+    <button id="theme-toggle" class="btn btn-secondary theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light mode">🌙</button>
+  </div>
 </header>
 
 <div class="tabs glass-panel-flat">
   <button class="tab-btn active" onclick="switchTab('astar',this)">A* Algorithm</button>
   <button class="tab-btn" onclick="switchTab('idastar',this)">IDA* Algorithm</button>
+  <button class="tab-btn" onclick="switchTab('bfs',this)">BFS Algorithm</button>
+  <button class="tab-btn" onclick="switchTab('dfs',this)">DFS Algorithm</button>
+  <button class="tab-btn" onclick="switchTab('sorting',this)">Sorting</button>
+  <button class="tab-btn" onclick="switchTab('trees',this)">Trees</button>
 </div>
 
 <div class="content">
 
+<!-- ===== A* TAB ===== -->
 <div id="tab-astar" class="tab-panel active">
   <div class="panel glass-panel">
     <h2>Add Weighted Edge</h2>
@@ -50,11 +68,17 @@
     </div>
     <div class="divider"></div>
     <h2>Results</h2>
-    <div class="card"><div class="label">Time Complexity</div><div class="value" id="as-tcplx">—</div></div>
-    <div class="card"><div class="label">Space Complexity</div><div class="value" id="as-scplx">—</div></div>
-    <div class="card"><div class="label">Nodes Explored</div><div class="value" id="as-nodes">—</div></div>
-    <div class="card"><div class="label">Path</div><div class="value" id="as-path-val">—</div></div>
+    <div class="results-grid">
+      <div class="card"><div class="label">Time Complexity</div><div class="value" id="as-tcplx">—</div></div>
+      <div class="card"><div class="label">Space Complexity</div><div class="value" id="as-scplx">—</div></div>
+      <div class="card"><div class="label">Nodes Explored</div><div class="value" id="as-nodes">—</div></div>
+      <div class="card"><div class="label">Path</div><div class="value" id="as-path-val">—</div></div>
+    </div>
     <div class="log-box" id="as-log">Add edges, set start &amp; end, then run.</div>
+    <div class="info-panel glass-panel" id="info-panel-as">
+      <div class="info-panel-header" onclick="toggleInfoPanel('as')"><span>ℹ Algorithm Info</span><span class="info-chevron">▾</span></div>
+      <div class="info-panel-body" id="info-body-as"></div>
+    </div>
   </div>
   <div class="viz">
     <div class="viz-header">
@@ -64,6 +88,7 @@
   </div>
 </div>
 
+<!-- ===== IDA* TAB ===== -->
 <div id="tab-idastar" class="tab-panel">
   <div class="panel glass-panel">
     <h2>Add Weighted Edge</h2>
@@ -90,17 +115,206 @@
     </div>
     <div class="divider"></div>
     <h2>Results</h2>
-    <div class="card"><div class="label">Time Complexity</div><div class="value" id="ida-tcplx">—</div></div>
-    <div class="card"><div class="label">Space Complexity</div><div class="value" id="ida-scplx">—</div></div>
-    <div class="card"><div class="label">Nodes Explored</div><div class="value" id="ida-nodes">—</div></div>
-    <div class="card"><div class="label">Path</div><div class="value" id="ida-path-val">—</div></div>
+    <div class="results-grid">
+      <div class="card"><div class="label">Time Complexity</div><div class="value" id="ida-tcplx">—</div></div>
+      <div class="card"><div class="label">Space Complexity</div><div class="value" id="ida-scplx">—</div></div>
+      <div class="card"><div class="label">Nodes Explored</div><div class="value" id="ida-nodes">—</div></div>
+      <div class="card"><div class="label">Path</div><div class="value" id="ida-path-val">—</div></div>
+    </div>
     <div class="log-box" id="ida-log">Add edges, set start &amp; end, then run.</div>
+    <div class="info-panel glass-panel" id="info-panel-ida">
+      <div class="info-panel-header" onclick="toggleInfoPanel('ida')"><span>ℹ Algorithm Info</span><span class="info-chevron">▾</span></div>
+      <div class="info-panel-body" id="info-body-ida"></div>
+    </div>
   </div>
   <div class="viz">
     <div class="viz-header">
       <div class="viz-title">IDA* Search Visualization</div>
     </div>
     <div id="ida-graph-wrap" class="glass-panel"></div>
+  </div>
+</div>
+
+<!-- ===== BFS TAB ===== -->
+<div id="tab-bfs" class="tab-panel">
+  <div class="panel glass-panel">
+    <h2>Add Directed Edge</h2>
+    <div class="hint">Type node names (e.g. A, B). Weight is ignored in BFS.</div>
+    <div class="edge-row">
+      <input id="bfs-from" placeholder="From" maxlength="4"/>
+      <span class="edge-arrow">→</span>
+      <input id="bfs-to" placeholder="To" maxlength="4"/>
+      <input id="bfs-weight" type="number" placeholder="Wt" value="1" min="1" style="width: 50px;" disabled/>
+      <button class="btn btn-primary" style="padding:7px 12px" onclick="bfsAddEdge()">Add</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Start / End Nodes</h2>
+    <div class="edge-row">
+      <input id="bfs-start" placeholder="Start" maxlength="4" style="flex:1"/>
+      <input id="bfs-end" placeholder="End" maxlength="4" style="flex:1"/>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="btn btn-green" onclick="runBfs()">▶ Run BFS Algorithm</button>
+      <button class="btn btn-secondary" onclick="bfsLoadExample()">Load Example</button>
+      <button class="btn btn-secondary" onclick="bfsGenerateRandom()">Random Graph</button>
+      <button class="btn btn-danger" onclick="bfsReset()">Clear Graph</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Results</h2>
+    <div class="results-grid">
+      <div class="card"><div class="label">Time Complexity</div><div class="value" id="bfs-tcplx">—</div></div>
+      <div class="card"><div class="label">Space Complexity</div><div class="value" id="bfs-scplx">—</div></div>
+      <div class="card"><div class="label">Nodes Explored</div><div class="value" id="bfs-nodes">—</div></div>
+      <div class="card"><div class="label">Path</div><div class="value" id="bfs-path-val">—</div></div>
+    </div>
+    <div class="log-box" id="bfs-log">Add edges, set start &amp; end, then run.</div>
+    <div class="info-panel glass-panel" id="info-panel-bfs">
+      <div class="info-panel-header" onclick="toggleInfoPanel('bfs')"><span>ℹ Algorithm Info</span><span class="info-chevron">▾</span></div>
+      <div class="info-panel-body" id="info-body-bfs"></div>
+    </div>
+  </div>
+  <div class="viz">
+    <div class="viz-header">
+      <div class="viz-title">Breadth-First Search (BFS)</div>
+    </div>
+    <div id="bfs-graph-wrap" class="glass-panel"></div>
+  </div>
+</div>
+
+<!-- ===== DFS TAB ===== -->
+<div id="tab-dfs" class="tab-panel">
+  <div class="panel glass-panel">
+    <h2>Add Directed Edge</h2>
+    <div class="hint">Type node names (e.g. A, B). Weight is ignored in DFS.</div>
+    <div class="edge-row">
+      <input id="dfs-from" placeholder="From" maxlength="4"/>
+      <span class="edge-arrow">→</span>
+      <input id="dfs-to" placeholder="To" maxlength="4"/>
+      <input id="dfs-weight" type="number" placeholder="Wt" value="1" min="1" style="width: 50px;" disabled/>
+      <button class="btn btn-primary" style="padding:7px 12px" onclick="dfsAddEdge()">Add</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Start / End Nodes</h2>
+    <div class="edge-row">
+      <input id="dfs-start" placeholder="Start" maxlength="4" style="flex:1"/>
+      <input id="dfs-end" placeholder="End" maxlength="4" style="flex:1"/>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="btn btn-cyan" onclick="runDfs()">▶ Run DFS Algorithm</button>
+      <button class="btn btn-secondary" onclick="dfsLoadExample()">Load Example</button>
+      <button class="btn btn-secondary" onclick="dfsGenerateRandom()">Random Graph</button>
+      <button class="btn btn-danger" onclick="dfsReset()">Clear Graph</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Results</h2>
+    <div class="results-grid">
+      <div class="card"><div class="label">Time Complexity</div><div class="value" id="dfs-tcplx">—</div></div>
+      <div class="card"><div class="label">Space Complexity</div><div class="value" id="dfs-scplx">—</div></div>
+      <div class="card"><div class="label">Nodes Explored</div><div class="value" id="dfs-nodes">—</div></div>
+      <div class="card"><div class="label">Path</div><div class="value" id="dfs-path-val">—</div></div>
+    </div>
+    <div class="log-box" id="dfs-log">Add edges, set start &amp; end, then run.</div>
+    <div class="info-panel glass-panel" id="info-panel-dfs">
+      <div class="info-panel-header" onclick="toggleInfoPanel('dfs')"><span>ℹ Algorithm Info</span><span class="info-chevron">▾</span></div>
+      <div class="info-panel-body" id="info-body-dfs"></div>
+    </div>
+  </div>
+  <div class="viz">
+    <div class="viz-header">
+      <div class="viz-title">Depth-First Search (DFS)</div>
+    </div>
+    <div id="dfs-graph-wrap" class="glass-panel"></div>
+  </div>
+</div>
+
+<!-- ===== SORTING TAB ===== -->
+<div id="tab-sorting" class="tab-panel">
+  <div class="panel glass-panel">
+    <h2>Algorithm</h2>
+    <div class="sort-algo-toggle">
+      <button class="btn btn-secondary sort-algo-btn active" id="sort-btn-bubble" onclick="selectSortAlgo('bubble', this)">Bubble Sort</button>
+      <button class="btn btn-secondary sort-algo-btn" id="sort-btn-merge" onclick="selectSortAlgo('merge', this)">Merge Sort</button>
+      <button class="btn btn-secondary sort-algo-btn" id="sort-btn-quick" onclick="selectSortAlgo('quick', this)">Quick Sort</button>
+      <button class="btn btn-secondary sort-algo-btn" id="sort-btn-heap" onclick="selectSortAlgo('heapsort', this)">Heap Sort</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Array Size</h2>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="range" id="sort-size-slider" min="10" max="100" step="5" value="30" style="flex:1;accent-color:var(--accent2);cursor:pointer;" oninput="document.getElementById('sort-size-val').textContent=this.value"/>
+      <span id="sort-size-val" style="font-family:var(--mono);font-size:13px;color:var(--accent2);min-width:28px;">30</span>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="btn btn-green" onclick="runSort()" id="sort-run-btn">▶ Run Sort</button>
+      <button class="btn btn-secondary" onclick="generateSortArray()">Generate Random Array</button>
+      <button class="btn btn-danger" onclick="resetSort()">Reset</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Legend</h2>
+    <div class="sort-legend">
+      <div class="sort-legend-item"><div class="sort-legend-dot" style="background:var(--sort-default)"></div><span>Unsorted</span></div>
+      <div class="sort-legend-item"><div class="sort-legend-dot" style="background:var(--sort-compare)"></div><span>Comparing</span></div>
+      <div class="sort-legend-item"><div class="sort-legend-dot" style="background:var(--sort-swap)"></div><span>Swapping / Placing</span></div>
+      <div class="sort-legend-item"><div class="sort-legend-dot" style="background:var(--sort-sorted)"></div><span>Sorted</span></div>
+    </div>
+    <div class="log-box" id="sort-log">Select an algorithm, generate an array, then run.</div>
+    <div class="info-panel glass-panel" id="info-panel-sorting">
+      <div class="info-panel-header" onclick="toggleInfoPanel('sorting')"><span>ℹ Algorithm Info</span><span class="info-chevron">▾</span></div>
+      <div class="info-panel-body" id="info-body-sorting"></div>
+    </div>
+  </div>
+  <div class="viz">
+    <div class="viz-header">
+      <div class="viz-title" id="sort-viz-title">Bubble Sort Visualization</div>
+    </div>
+    <div id="sort-canvas-wrap" class="glass-panel">
+      <div id="sort-bars-container" class="sort-bars-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TREES TAB ===== -->
+<div id="tab-trees" class="tab-panel">
+  <div class="panel glass-panel">
+    <h2>Tree Type</h2>
+    <div class="sort-algo-toggle">
+      <button class="btn btn-secondary sort-algo-btn active" id="tree-btn-bst" onclick="selectTreeType('bst', this)">BST</button>
+      <button class="btn btn-secondary sort-algo-btn" id="tree-btn-avl" onclick="selectTreeType('avl', this)">AVL Tree</button>
+      <button class="btn btn-secondary sort-algo-btn" id="tree-btn-heap" onclick="selectTreeType('heap', this)">Min Heap</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Value</h2>
+    <div class="edge-row">
+      <input id="tree-val" type="number" placeholder="Value" style="flex:1;width:auto;" onkeydown="if(event.key==='Enter') treeInsert()"/>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group" id="tree-op-btns">
+      <button class="btn btn-green" onclick="treeInsert()">⊕ Insert</button>
+      <button class="btn btn-cyan" onclick="treeSearch()">⌕ Search</button>
+      <button class="btn btn-danger" onclick="treeDelete()">⊖ Delete</button>
+      <button class="btn btn-secondary" onclick="treeClear()">Clear Tree</button>
+    </div>
+    <div id="tree-heap-btns" class="btn-group" style="display:none;">
+      <button class="btn btn-green" onclick="treeInsert()">⊕ Push</button>
+      <button class="btn btn-danger" onclick="heapPop()">⊖ Pop Min</button>
+      <button class="btn btn-secondary" onclick="treeClear()">Clear Heap</button>
+    </div>
+    <div class="divider"></div>
+    <h2>Rotation Label</h2>
+    <div id="tree-rotation-label" class="rotation-label" style="display:none;"></div>
+    <div class="log-box" id="tree-log">Select tree type, enter a value, and click an operation.</div>
+    <div class="info-panel glass-panel" id="info-panel-trees">
+      <div class="info-panel-header" onclick="toggleInfoPanel('trees')"><span>ℹ Algorithm Info</span><span class="info-chevron">▾</span></div>
+      <div class="info-panel-body" id="info-body-trees"></div>
+    </div>
+  </div>
+  <div class="viz">
+    <div class="viz-header">
+      <div class="viz-title" id="tree-viz-title">Binary Search Tree (BST)</div>
+    </div>
+    <div id="tree-graph-wrap" class="glass-panel"></div>
   </div>
 </div>
 
